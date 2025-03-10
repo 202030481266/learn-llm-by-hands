@@ -45,7 +45,7 @@ C = torch.einsum("ik,kj->ij", A, B)
 同样的在高维矩阵中，我们有计算attention_scores的`qk`矩阵，就可以计算当前`q`中第`i`个token对于`k`中第`j`个token的attention_score。
 
 $$
-\text{scores}_{b, i, h, j} = \sum_{x=1}^{d} q_{b, i, h, x} \times k_{b, j, h, x}
+s_{b, i, h, j} = \sum_{x=1}^{d} q_{b, i, h, x} \times k_{b, j, h, x}
 $$
 
 使用einsum可以表示为：
