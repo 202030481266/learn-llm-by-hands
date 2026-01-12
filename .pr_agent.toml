@@ -3,4 +3,5 @@
 model="MiniMax-M2.1"
 fallback_models=["MiniMax-M2.1-lightning", "MiniMax-M2"]
 custom_model_max_tokens=204800
+response_language="zh-CN"
 
