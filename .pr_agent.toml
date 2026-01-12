@@ -1,0 +1,3 @@
+[config]
+model="MiniMax-M2.1"
+fallback_models=["MiniMax-M2.1-lightning", "MiniMax-M2"]
