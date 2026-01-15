@@ -21,45 +21,46 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install & Configure Cloudflare WARP (Proxy Mode)
+      - name: Install WARP & Privoxy (HTTP Bridge)
         run: |
-          # 1. 添加 Cloudflare 的 GPG Key 和 源
+          # 1. 安装 Cloudflare WARP 和 Privoxy
           curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
           echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
           
-          # 2. 安装 WARP
           sudo apt-get update
-          sudo apt-get install -y cloudflare-warp
+          sudo apt-get install -y cloudflare-warp privoxy
 
-          # 3. 配置 WARP 为 Proxy 模式 (SOCKS5)
-          # 注意：这里使用 --accept-tos 自动接受协议
+          # 2. 配置 WARP (SOCKS5 端口 40000)
           sudo warp-cli --accept-tos registration new
           sudo warp-cli --accept-tos mode proxy
           sudo warp-cli --accept-tos proxy port 40000
-          
-          # 4. 连接
           sudo warp-cli --accept-tos connect
           
-          # 5. 等待连接成功并验证
-          echo "Waiting for WARP connection..."
-          sleep 5
-          # 测试代理是否工作 (通过代理访问 trace 接口)
-          curl -x socks5://127.0.0.1:40000 -s https://www.cloudflare.com/cdn-cgi/trace | grep "warp=on" || echo "WARP connection check failed, but proceeding..."
+          # 等待 WARP 启动
+          sleep 3
+
+          # 3. 配置 Privoxy (将 HTTP 8118 转为 SOCKS5 40000)
+          # listen-address 0.0.0.0:8118 让 Docker 容器可以访问它
+          echo "listen-address 0.0.0.0:8118" | sudo tee -a /etc/privoxy/config
+          echo "forward-socks5 / 127.0.0.1:40000 ." | sudo tee -a /etc/privoxy/config
+          
+          # 重启 Privoxy 使配置生效
+          sudo systemctl restart privoxy
+          
+          # 4. 验证链路 (通过 HTTP 代理访问)
+          echo "Testing Proxy Chain..."
+          curl -x http://127.0.0.1:8118 -s https://www.cloudflare.com/cdn-cgi/trace | grep "warp=on" || echo "Check failed but trying anyway..."
+      # ----------------------------------------
 
       - name: PR Agent action step
         uses: qodo-ai/pr-agent@main
         env:
-          # 基础配置
           ANTHROPIC__KEY: ${{ secrets.ANTHROPIC_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           
-          # --- 核心配置：告诉 PR Agent 走代理 ---
-          # 172.17.0.1 是 GitHub Runner 中 Docker 容器访问宿主机的默认网关 IP
-          # 因为 PR Agent 跑在 Docker 里，它不能用 127.0.0.1，必须用宿主机网关 IP
-          HTTPS_PROXY: "socks5://172.17.0.1:40000"
-          HTTP_PROXY: "socks5://172.17.0.1:40000"
-          # -----------------------------------
-
+          HTTPS_PROXY: "http://172.17.0.1:8118"
+          HTTP_PROXY: "http://172.17.0.1:8118"
+          
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
