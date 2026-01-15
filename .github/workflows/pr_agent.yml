@@ -6,6 +6,7 @@ on:
     types: [created, edited]
   pull_request_review_comment:
     types: [created, edited, dismissed]
+
 jobs:
   pr_agent_job:
     if: ${{ github.event.sender.type != 'Bot' }}
@@ -15,6 +16,11 @@ jobs:
       pull-requests: write
       contents: write
     steps:
+      - name: Setup Cloudflare WARP
+        uses: fscarmen/warp-on-actions@v1.1
+        with:
+          stack: ipv4
+
       - name: PR Agent action step
         uses: qodo-ai/pr-agent@main
         env:
