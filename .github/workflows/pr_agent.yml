@@ -21,6 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # --- 核心修改：使用 8888 端口避开冲突 ---
       - name: Install WARP & Privoxy (HTTP Bridge)
         run: |
           # 1. 安装 Cloudflare WARP 和 Privoxy
@@ -37,11 +38,11 @@ jobs:
           sudo warp-cli --accept-tos connect
           
           # 等待 WARP 启动
-          sleep 3
+          sleep 5
 
-          # 3. 配置 Privoxy (将 HTTP 8118 转为 SOCKS5 40000)
-          # listen-address 0.0.0.0:8118 让 Docker 容器可以访问它
-          echo "listen-address 0.0.0.0:8118" | sudo tee -a /etc/privoxy/config
+          # 3. 配置 Privoxy (将 HTTP 8888 转为 SOCKS5 40000)
+          # 注意：这里改用了 8888 端口，避免和默认的 8118 冲突
+          echo "listen-address 0.0.0.0:8888" | sudo tee -a /etc/privoxy/config
           echo "forward-socks5 / 127.0.0.1:40000 ." | sudo tee -a /etc/privoxy/config
           
           # 重启 Privoxy 使配置生效
@@ -49,7 +50,7 @@ jobs:
           
           # 4. 验证链路 (通过 HTTP 代理访问)
           echo "Testing Proxy Chain..."
-          curl -x http://127.0.0.1:8118 -s https://www.cloudflare.com/cdn-cgi/trace | grep "warp=on" || echo "Check failed but trying anyway..."
+          curl -x http://127.0.0.1:8888 -s https://www.cloudflare.com/cdn-cgi/trace | grep "warp=on" || echo "Check failed but trying anyway..."
       # ----------------------------------------
 
       - name: PR Agent action step
@@ -59,8 +60,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           
-          HTTPS_PROXY: "http://172.17.0.1:8118"
-          HTTP_PROXY: "http://172.17.0.1:8118"
+          # --- 关键修改 ---
+          # 协议: http:// (原生支持)
+          # 端口: 8888 (Privoxy 的新端口)
+          # IP: 172.17.0.1 (Docker 宿主机网关)
+          HTTPS_PROXY: "http://172.17.0.1:8888"
+          HTTP_PROXY: "http://172.17.0.1:8888"
+          # ----------------
           
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
