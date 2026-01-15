@@ -20,8 +20,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          config.model: "anthropic/claude-opus-4-5-20251101"
-          config.fallback_models: '["anthropic/claude-sonnet-4-5-20250929", "anthropic/claude-haiku-4-5-20251001"]'
           ANTHROPIC.KEY: ${{ secrets.ANTHROPIC_KEY }}
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
