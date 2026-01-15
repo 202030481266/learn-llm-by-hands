@@ -4,6 +4,3 @@ model="anthropic/claude-opus-4-5-20251101"
 fallback_models=["anthropic/claude-sonnet-4-5-20250929", "anthropic/claude-haiku-4-5-20251001"]
 response_language="zh-CN"
 custom_model_max_tokens=204800
-
-[anthropic]
-api_base="https://aiproxies.cc"

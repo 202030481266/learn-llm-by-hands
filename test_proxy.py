@@ -1,18 +1,9 @@
 import litellm
 import os
 
-# 2. 设置 Base URL
-# 注意：大多数中转站要求末尾必须加 /v1
-# 如果你的报错是 "Just a moment"，极大概率是因为你漏了 /v1，导致请求打到了网页首页
-# 开启调试模式，这会打印出具体的 Request URL，非常重要
-litellm.set_verbose = True
-
 try:
-    # 3. 关键点：在模型前加 "openai/" 前缀
-    # 这告诉 litellm："虽然我要调 Claude，但请用 OpenAI 的格式（JSON schema）发请求"
-    # 这样 litellm 就会把请求发到 .../v1/chat/completions 而不是 Anthropic 的原生路径
     response = litellm.completion(
-        model="anthropic/claude-sonnet-4-5-20250929", 
+        model="anthropic/claude-opus-4-5-20251101", 
         messages=[
             {"role": "user", "content": "如果你能看到这句话，请回复'连接成功'并告诉我你是谁。"}
         ],
