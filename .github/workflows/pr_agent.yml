@@ -20,5 +20,8 @@ jobs:
         env:
           OPENAI__KEY: ${{ secrets.OPENAI__KEY }}
           OPENAI__API_BASE: ${{ secrets.OPENAI__API_BASE }}
+          ANTHROPIC__KEY: ${{ secrets.ANTHROPIC_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
