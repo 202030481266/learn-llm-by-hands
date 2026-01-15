@@ -18,10 +18,7 @@ jobs:
       - name: PR Agent action step
         uses: qodo-ai/pr-agent@main
         env:
-          OPENAI__KEY: ${{ secrets.OPENAI__KEY }}
-          OPENAI__API_BASE: ${{ secrets.OPENAI__API_BASE }}
           ANTHROPIC__KEY: ${{ secrets.ANTHROPIC_KEY }}
-          ANTHROPIC__API_BASE: ${{ secrets.ANTHROPIC_API_BASE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           github_action_config.auto_review: "true"

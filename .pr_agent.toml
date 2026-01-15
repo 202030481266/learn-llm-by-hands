@@ -1,6 +1,9 @@
 # https://github.com/qodo-ai/pr-agent/tree/main/pr_agent/settings
 [config]
-model="claude-opus-4-5-20251101"
-fallback_models=["claude-sonnet-4-5-20250929", "claude-haiku-4-5-20251001"]
+model="anthropic/claude-opus-4-5-20251101"
+fallback_models=["anthropic/claude-sonnet-4-5-20250929", "anthropic/claude-haiku-4-5-20251001"]
 response_language="zh-CN"
 custom_model_max_tokens=204800
+
+[openai]
+api_base="https://aiproxies.cc"
