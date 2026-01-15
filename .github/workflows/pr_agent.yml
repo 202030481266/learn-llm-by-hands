@@ -20,6 +20,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY }}
+          # ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_KEY }}
+          ANTHROPIC_API_BASE: "https://aiproxies.cc"
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
